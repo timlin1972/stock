@@ -3,6 +3,8 @@ use std::error::Error;
 use serde::{Deserialize, Serialize};
 use tokio::time::Duration;
 
+use crate::twse::company_map::CompanyMap;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TwseResponse {
     pub stat: String,
@@ -13,12 +15,18 @@ pub struct TwseResponse {
 }
 
 impl TwseResponse {
-    pub async fn new(stock_no: &str, year_month: &str) -> Self {
+    pub async fn new(company_map: &CompanyMap, stock_no: &str, year_month: &str) -> Self {
         let fetch_result = fetch_stock_data(stock_no, year_month).await.unwrap();
         let parsed: TwseResponse = serde_json::from_str(&fetch_result).unwrap();
 
         if parsed.stat != "OK" {
-            panic!("TWSE 回傳錯誤狀態: {}", parsed.stat);
+            panic!(
+                "TWSE 回傳錯誤狀態: {} for stock_no: {}({}), year_month: {}",
+                parsed.stat,
+                stock_no,
+                company_map.get(stock_no),
+                year_month
+            );
         }
 
         TwseResponse {

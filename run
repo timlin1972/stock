@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# 指定要搜尋的目錄
+TARGET_DIR="./data"
+
+# 遞迴搜尋並刪除所有 202506.json
+find "$TARGET_DIR" -type f -name "202507.json" -exec rm -f {} \;

@@ -3,33 +3,16 @@ use std::fs;
 use std::fs::File;
 use std::io::BufWriter;
 
-use chrono::Datelike;
-use chrono::Local;
+use chrono::{Datelike, Duration, Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 
+use crate::common;
 use crate::twse;
+use crate::twse::company_map::CompanyMap;
 
 const DATA_DIR: &str = "data";
 
-fn divide_by_1000(value: u64) -> u64 {
-    (value as f64 / 1000.0) as u64
-}
-
-fn format_commas(value: u64) -> String {
-    let s = value.to_string();
-    let bytes = s.as_bytes();
-    let mut result = String::new();
-    let len = bytes.len();
-    for (i, &b) in bytes.iter().enumerate() {
-        result.push(b as char);
-        if (len - i - 1).is_multiple_of(3) && i != len - 1 {
-            result.push(',');
-        }
-    }
-    result
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DailyData {
     pub date: String,      //民國日期 (113+1911 = 西元 2024 年)
     pub volume: u64,       //成交股數
@@ -43,13 +26,30 @@ pub struct DailyData {
     pub note: String,      //備註
 }
 
+impl DailyData {
+    pub fn print(&self, company_map: &CompanyMap, stock_no: &str) {
+        println!(
+            "{:<10}{:<6}{:>10}{:>8.2}{:>8.2}{:>8.2}{:>8.2}{:>8.2}  {:<20}",
+            self.date,
+            stock_no,
+            common::format_commas(common::divide_by_1000(self.volume)),
+            self.open,
+            self.close,
+            self.high,
+            self.low,
+            self.change,
+            company_map.get(stock_no),
+        );
+    }
+}
+
 impl fmt::Display for DailyData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{:<10}{:>10}{:>8.2}{:>8.2}{:>8.2}{:>8.2}{:>8.2}",
             self.date,
-            format_commas(divide_by_1000(self.volume)),
+            common::format_commas(common::divide_by_1000(self.volume)),
             self.open,
             self.close,
             self.high,
@@ -67,35 +67,45 @@ pub struct MonthlyData {
 }
 
 impl MonthlyData {
-    pub async fn new(stock_no: &str, year_month: &str) -> Self {
+    pub async fn new(company_map: &CompanyMap, stock_no: &str, year_month: &str) -> Self {
         let mut fetch_again = false;
 
-        if is_in_year_month(year_month) {
-            // if today is within year_month, then fetch again
-            println!("Data for {stock_no}/{year_month} is current month, fetching fresh data...");
-            fetch_again = true;
-            // twse::stock_data::TwseResponse::new(stock_no, year_month).await
-        } else {
-            // try to read from storage
-            let path = format!("{DATA_DIR}/{stock_no}/{year_month}.json");
-            if let Ok(file) = File::open(&path) {
-                let reader = std::io::BufReader::new(file);
-                if serde_json::from_reader::<_, MonthlyData>(reader).is_ok() {
-                    println!("Loaded data for {stock_no}/{year_month} from storage.");
-                } else {
-                    println!(
-                        "Failed to parse data from storage for {stock_no}/{year_month}, fetching fresh data..."
-                    );
-                    fetch_again = true;
+        // if file is not exists or cannot be parsed, fetch again
+        let path = format!("{DATA_DIR}/{stock_no}/{year_month}.json");
+        if let Ok(file) = File::open(&path) {
+            let reader = std::io::BufReader::new(file);
+            if let Ok(monthly_data) = serde_json::from_reader::<_, MonthlyData>(reader) {
+                // println!("Loaded data for {stock_no}/{year_month} from storage.");
+                if is_in_year_month(year_month) {
+                    let current_nearest_workday = nearest_workday(Local::now().date_naive());
+                    let current_roc_date = common::naive_to_roc_date(current_nearest_workday);
+                    // if current_roc_date is not in daily_data, then fetch again
+                    if !monthly_data
+                        .daily_data
+                        .iter()
+                        .any(|d| d.date == current_roc_date)
+                    {
+                        println!(
+                            "Data {} for {stock_no}/{year_month} is outdated, fetching fresh data...",
+                            current_roc_date
+                        );
+                        fetch_again = true;
+                    }
                 }
             } else {
-                println!("No stored data for {stock_no}/{year_month}, fetching fresh data...");
+                println!(
+                    "Failed to parse data from storage for {stock_no}/{year_month}, fetching fresh data..."
+                );
                 fetch_again = true;
             }
-        };
+        } else {
+            println!("No stored data for {stock_no}/{year_month}, fetching fresh data...");
+            fetch_again = true;
+        }
 
         if fetch_again {
-            let twse_response = twse::stock_data::TwseResponse::new(stock_no, year_month).await;
+            let twse_response =
+                twse::stock_data::TwseResponse::new(company_map, stock_no, year_month).await;
 
             let mut daily_data = Vec::new();
             for entry in twse_response.data.unwrap_or_default() {
@@ -164,8 +174,8 @@ impl MonthlyData {
             self.year_month
         );
         println!(
-            "{:<8}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6}",
-            "日期", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌"
+            "{:<6}{:<8}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6}",
+            "台股", "日期", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌"
         );
         for daily in &self.daily_data {
             println!("{}", daily);
@@ -181,4 +191,12 @@ fn is_in_year_month(year_month: &str) -> bool {
     let current_year_month = format!("{:04}{:02}", today.year(), today.month());
 
     current_year_month == year_month
+}
+
+fn nearest_workday(date: NaiveDate) -> NaiveDate {
+    match date.weekday() {
+        chrono::Weekday::Sat => date - Duration::days(1), // 昨天 (週五)
+        chrono::Weekday::Sun => date - Duration::days(2), // 前天 (週五)
+        _ => date,                                        // 週一到週五 → 今天
+    }
 }

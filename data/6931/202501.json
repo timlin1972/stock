@@ -1,0 +1,78 @@
+{
+  "stock_no": "6931",
+  "year_month": "202501",
+  "daily_data": [
+    {
+      "date": "114/01/15",
+      "volume": 1170765,
+      "amount": 93205605,
+      "open": 80.8,
+      "high": 81.3,
+      "low": 77.0,
+      "close": 80.0,
+      "change": 0.0,
+      "transactions": 1147,
+      "note": ""
+    },
+    {
+      "date": "114/01/16",
+      "volume": 294872,
+      "amount": 23109838,
+      "open": 80.0,
+      "high": 80.0,
+      "low": 77.4,
+      "close": 77.4,
+      "change": -2.6,
+      "transactions": 471,
+      "note": ""
+    },
+    {
+      "date": "114/01/17",
+      "volume": 225740,
+      "amount": 16835705,
+      "open": 76.7,
+      "high": 76.7,
+      "low": 73.2,
+      "close": 74.3,
+      "change": -3.1,
+      "transactions": 457,
+      "note": ""
+    },
+    {
+      "date": "114/01/20",
+      "volume": 204427,
+      "amount": 14550194,
+      "open": 72.3,
+      "high": 72.3,
+      "low": 70.3,
+      "close": 70.8,
+      "change": -3.5,
+      "transactions": 425,
+      "note": ""
+    },
+    {
+      "date": "114/01/21",
+      "volume": 142778,
+      "amount": 10309940,
+      "open": 70.8,
+      "high": 73.9,
+      "low": 70.8,
+      "close": 72.2,
+      "change": 1.4,
+      "transactions": 179,
+      "note": ""
+    },
+    {
+      "date": "114/01/22",
+      "volume": 118175,
+      "amount": 8436528,
+      "open": 71.9,
+      "high": 72.0,
+      "low": 70.4,
+      "close": 71.7,
+      "change": -0.5,
+      "transactions": 464,
+      "note": ""
+    }
+  ]
+}
