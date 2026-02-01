@@ -3,18 +3,6 @@
   "year_month": "202512",
   "daily_data": [
     {
-      "date": "114/12/01",
-      "volume": 55,
-      "amount": 937,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 3,
-      "note": ""
-    },
-    {
       "date": "114/12/02",
       "volume": 18310,
       "amount": 311631,
@@ -24,18 +12,6 @@
       "close": 17.05,
       "change": 0.0,
       "transactions": 12,
-      "note": ""
-    },
-    {
-      "date": "114/12/03",
-      "volume": 411,
-      "amount": 6994,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 3,
       "note": ""
     },
     {
@@ -75,18 +51,6 @@
       "note": ""
     },
     {
-      "date": "114/12/09",
-      "volume": 594,
-      "amount": 9748,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 6,
-      "note": ""
-    },
-    {
       "date": "114/12/10",
       "volume": 1561,
       "amount": 26985,
@@ -120,18 +84,6 @@
       "close": 16.7,
       "change": -0.45,
       "transactions": 10,
-      "note": ""
-    },
-    {
-      "date": "114/12/15",
-      "volume": 879,
-      "amount": 13408,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 11,
       "note": ""
     },
     {
@@ -171,54 +123,6 @@
       "note": ""
     },
     {
-      "date": "114/12/19",
-      "volume": 1352,
-      "amount": 22152,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 6,
-      "note": ""
-    },
-    {
-      "date": "114/12/22",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
-      "note": ""
-    },
-    {
-      "date": "114/12/23",
-      "volume": 227,
-      "amount": 3729,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 3,
-      "note": ""
-    },
-    {
-      "date": "114/12/24",
-      "volume": 644,
-      "amount": 10656,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 5,
-      "note": ""
-    },
-    {
       "date": "114/12/26",
       "volume": 9898,
       "amount": 164466,
@@ -240,30 +144,6 @@
       "close": 15.85,
       "change": -0.55,
       "transactions": 8,
-      "note": ""
-    },
-    {
-      "date": "114/12/30",
-      "volume": 11,
-      "amount": 174,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 1,
-      "note": ""
-    },
-    {
-      "date": "114/12/31",
-      "volume": 240,
-      "amount": 3516,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 2,
       "note": ""
     }
   ]

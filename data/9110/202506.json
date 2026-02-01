@@ -3,18 +3,6 @@
   "year_month": "202506",
   "daily_data": [
     {
-      "date": "114/06/02",
-      "volume": 10,
-      "amount": 63,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 1,
-      "note": ""
-    },
-    {
       "date": "114/06/03",
       "volume": 9000,
       "amount": 55120,
@@ -84,18 +72,6 @@
       "close": 6.17,
       "change": -0.01,
       "transactions": 10,
-      "note": ""
-    },
-    {
-      "date": "114/06/11",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
       "note": ""
     },
     {
@@ -171,30 +147,6 @@
       "note": ""
     },
     {
-      "date": "114/06/20",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
-      "note": ""
-    },
-    {
-      "date": "114/06/23",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
-      "note": ""
-    },
-    {
       "date": "114/06/24",
       "volume": 15000,
       "amount": 91200,
@@ -204,18 +156,6 @@
       "close": 6.08,
       "change": 0.0,
       "transactions": 5,
-      "note": ""
-    },
-    {
-      "date": "114/06/25",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
       "note": ""
     },
     {
@@ -240,18 +180,6 @@
       "close": 6.02,
       "change": -0.05,
       "transactions": 6,
-      "note": ""
-    },
-    {
-      "date": "114/06/30",
-      "volume": 0,
-      "amount": 0,
-      "open": 0.0,
-      "high": 0.0,
-      "low": 0.0,
-      "close": 0.0,
-      "change": 0.0,
-      "transactions": 0,
       "note": ""
     }
   ]

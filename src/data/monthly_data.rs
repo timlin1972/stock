@@ -144,7 +144,7 @@ impl MonthlyData {
         }
     }
 
-    fn write_to_storage(&self) {
+    pub fn write_to_storage(&self) {
         // if DATA_DIR does not exist, create it
         if fs::metadata(DATA_DIR).is_err() {
             fs::create_dir_all(DATA_DIR).unwrap();
