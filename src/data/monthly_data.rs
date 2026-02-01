@@ -166,6 +166,7 @@ impl MonthlyData {
         serde_json::to_writer_pretty(writer, self).unwrap();
     }
 
+    /*
     pub fn print_summary(&self, company_map: &twse::company_map::CompanyMap) {
         println!(
             "{} ({}) / {}",
@@ -181,6 +182,7 @@ impl MonthlyData {
             println!("{}", daily);
         }
     }
+     */
 }
 
 fn is_in_year_month(year_month: &str) -> bool {

@@ -14,12 +14,13 @@ impl DojiAnalysisResult {
     }
 }
 
+/*
 pub fn anal_month_company(company_map: &CompanyMap, monthly_data: &MonthlyData) {
     // Placeholder for Doji analysis implementation
     println!("Performing Doji analysis...");
     println!(
-        "{:<8}{:<5}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6} {}",
-        "日期", "台股", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌", "公司名稱"
+        "{:<8}{:<5}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6} 公司名稱",
+        "日期", "台股", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌",
     );
 
     // Example: Iterate through daily data and identify Doji patterns
@@ -35,6 +36,7 @@ pub fn anal_month_company(company_map: &CompanyMap, monthly_data: &MonthlyData) 
         }
     }
 }
+ */
 
 pub fn anal_date_company(
     _company_map: &CompanyMap,

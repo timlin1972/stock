@@ -27,14 +27,15 @@ pub async fn anal_date_company(company_map: &CompanyMap, stock_no: &str, year_mo
 
 pub async fn anal_date_all_companies(company_map: &CompanyMap, year_month_date: &str) {
     println!(
-        "{:<8}{:<5}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6} {}",
-        "日期", "台股", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌", "公司名稱"
+        "{:<8}{:<5}{:>6}{:>5}{:>5}{:>5}{:>5}{:>6} 公司名稱",
+        "日期", "台股", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌",
     );
     for company in &company_map.stock_map {
         anal_date_company(company_map, &company.stock_no, year_month_date).await;
     }
 }
 
+/*
 pub fn long_red_candle_analysis(company_map: &CompanyMap, monthly_data: &MonthlyData) {
     // Placeholder for Long Red Candle analysis implementation
     println!("Performing Long Red Candle analysis...");
@@ -54,3 +55,4 @@ pub fn long_red_candle_analysis(company_map: &CompanyMap, monthly_data: &Monthly
         }
     }
 }
+ */

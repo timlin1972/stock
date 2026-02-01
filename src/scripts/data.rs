@@ -7,9 +7,11 @@ pub async fn fetch_data_monthly_all_companies(company_map: &CompanyMap, year_mon
     }
 }
 
+/*
 pub async fn fetch_data_yearly(company_map: &CompanyMap, year: &str) {
     for month in 1..=12 {
         let year_month = format!("{}{:02}", year, month);
         fetch_data_monthly_all_companies(company_map, &year_month).await;
     }
 }
+ */

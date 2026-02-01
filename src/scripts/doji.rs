@@ -2,12 +2,14 @@ use crate::analysis::doji;
 use crate::data::monthly_data::MonthlyData;
 use crate::twse::company_map::CompanyMap;
 
+/*
 pub async fn anal_month_all_compies(company_map: &CompanyMap, year_month: &str) {
     for company in &company_map.stock_map {
         let monthly_data = MonthlyData::new(company_map, &company.stock_no, year_month).await;
         doji::anal_month_company(company_map, &monthly_data);
     }
 }
+ */
 
 pub async fn anal_date_all_companies(
     company_map: &CompanyMap,

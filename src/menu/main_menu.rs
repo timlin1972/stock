@@ -1,13 +1,13 @@
-use std::io;
 use std::fs;
-use std::path::Path;
 use std::fs::File;
+use std::io;
+use std::path::Path;
 
 use crate::analysis;
 use crate::common;
+use crate::data::monthly_data::MonthlyData;
 use crate::scripts;
 use crate::twse::company_map::CompanyMap;
-use crate::data::monthly_data::MonthlyData;
 
 pub fn print_line() {
     println!("--------------------------------------------------------------------------------");
@@ -64,10 +64,10 @@ async fn menu_fetch_data(company_map: &CompanyMap) {
     // 去掉換行符號
     let input = input.trim();
 
-    scripts::data::fetch_data_monthly_all_companies(&company_map, input).await;
+    scripts::data::fetch_data_monthly_all_companies(company_map, input).await;
 }
 
-async fn menu_refactor_data(company_map: &CompanyMap) {
+async fn menu_refactor_data(_company_map: &CompanyMap) {
     let root = Path::new("data");
 
     // 遞迴走訪
@@ -84,10 +84,15 @@ async fn menu_refactor_data(company_map: &CompanyMap) {
                     // 如果是檔案，印出檔案名稱
                     let file = File::open(&p).unwrap();
                     let reader = std::io::BufReader::new(file);
-                    let mut monthly_data = serde_json::from_reader::<_, MonthlyData>(reader).unwrap();
+                    let mut monthly_data =
+                        serde_json::from_reader::<_, MonthlyData>(reader).unwrap();
                     let mut refactor = false;
                     for daily in &monthly_data.daily_data {
-                        if daily.open == 0.0 || daily.high == 0.0 || daily.low == 0.0 || daily.close == 0.0 {
+                        if daily.open == 0.0
+                            || daily.high == 0.0
+                            || daily.low == 0.0
+                            || daily.close == 0.0
+                        {
                             println!(
                                 "將移除: date={} open={} high={} low={} close={}",
                                 daily.date, daily.open, daily.high, daily.low, daily.close
@@ -96,7 +101,9 @@ async fn menu_refactor_data(company_map: &CompanyMap) {
                         }
                     }
                     if refactor {
-                        monthly_data.daily_data.retain(|d| d.open != 0.0 && d.high != 0.0 && d.low != 0.0 && d.close != 0.0);
+                        monthly_data.daily_data.retain(|d| {
+                            d.open != 0.0 && d.high != 0.0 && d.low != 0.0 && d.close != 0.0
+                        });
                         monthly_data.write_to_storage();
                     }
                 }
@@ -117,7 +124,7 @@ async fn menu_long_red_candle_analysis(company_map: &CompanyMap) {
     let input = input.trim();
 
     print_line();
-    analysis::long_red_candle::anal_date_all_companies(&company_map, input).await;
+    analysis::long_red_candle::anal_date_all_companies(company_map, input).await;
     print_line();
 }
 
@@ -149,12 +156,11 @@ async fn menu_macd_golden_cross_analysis(company_map: &CompanyMap) {
     print_line();
 
     let crosses =
-        scripts::macd::anal_date_all_companies(&company_map, input_from, input_to, input_date)
-            .await;
+        scripts::macd::anal_date_all_companies(company_map, input_from, input_to, input_date).await;
 
     for cross in &crosses {
         if cross.cross_type == analysis::macd::MacdCrossType::GoldenCross {
-            cross.print(&company_map);
+            cross.print(company_map);
         }
     }
     print_line();
@@ -190,16 +196,16 @@ async fn menu_volume_larger_analysis(company_map: &CompanyMap) {
     print_line();
 
     let volume_results =
-        scripts::volume::volume_larger_than_threshold(&company_map, volume_threshold, input_date)
+        scripts::volume::volume_larger_than_threshold(company_map, volume_threshold, input_date)
             .await;
     println!(
-        "{:<8}{:<6}{:>4}{:>5}{:>5}{:>5}{:>5}{:>6} {}",
-        "日期", "股號", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌", "公司名稱"
+        "{:<8}{:<6}{:>4}{:>5}{:>5}{:>5}{:>5}{:>6} 公司名稱",
+        "日期", "股號", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌",
     );
     for volume_result in &volume_results {
         volume_result
             .daily_data
-            .print(&company_map, &volume_result.stock_no);
+            .print(company_map, &volume_result.stock_no);
     }
 
     print_line();
@@ -264,12 +270,9 @@ async fn menu_macd_golden_cross_volume_larger_analysis(company_map: &CompanyMap)
     )
     .await;
 
-    println!(
-        "{:<8} {:<10} {:<4} {}",
-        "股號", "日期", "成交張數", "公司名稱"
-    );
+    println!("{:<8} {:<10} {:<4} 公司名稱", "股號", "日期", "成交張數",);
     for result in &results {
-        result.print(&company_map);
+        result.print(company_map);
     }
 
     print_line();
@@ -286,14 +289,14 @@ async fn menu_doji_analysis(company_map: &CompanyMap) {
 
     print_line();
 
-    let results = scripts::doji::anal_date_all_companies(&company_map, input_date).await;
+    let results = scripts::doji::anal_date_all_companies(company_map, input_date).await;
 
     println!(
-        "{:<8}{:<6}{:>4}{:>5}{:>5}{:>5}{:>5}{:>6} {}",
-        "日期", "股號", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌", "公司名稱"
+        "{:<8}{:<6}{:>4}{:>5}{:>5}{:>5}{:>5}{:>6} 公司名稱",
+        "日期", "股號", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌",
     );
     for result in &results {
-        result.print(&company_map);
+        result.print(company_map);
     }
 
     print_line();
@@ -309,23 +312,24 @@ async fn menu_doji_in_swing_analysis(company_map: &CompanyMap) {
     let mut input_to = String::new();
     io::stdin().read_line(&mut input_to).expect("讀取失敗");
     let input_to = input_to.trim();
-    
+
     println!("請輸入日期 (YYYYMMDD): ");
     let mut input_date = String::new();
     io::stdin().read_line(&mut input_date).expect("讀取失敗");
     let input_date = input_date.trim();
 
     let results = scripts::complex::anal_doji_in_swing_all_companies(
-        &company_map,
+        company_map,
         input_from,
         input_to,
         input_date,
-    ).await;
+    )
+    .await;
 
     print_line();
     println!(
-        "{:<8}{:<6}{:>6}{:>6}{:>6}{:>5}{:>5}{:>6}{:>6} {}",
-        "日期", "股號", "現價", "最高價", "最低價", "高", "低", "最高價", "最低價", "公司名稱"
+        "{:<8}{:<6}{:>6}{:>6}{:>6}{:>5}{:>5}{:>6}{:>6} 公司名稱",
+        "日期", "股號", "現價", "最高價", "最低價", "高", "低", "最高價", "最低價",
     );
 
     for result in &results {
@@ -340,8 +344,7 @@ async fn menu_doji_in_swing_analysis(company_map: &CompanyMap) {
             if result.meet_low { "是" } else { "否" },
             result.daily_data.close * 1.3,
             result.daily_data.close * 0.7,
-            company_map
-                .get(&result.stock_no)
+            company_map.get(&result.stock_no)
         );
     }
     print_line();

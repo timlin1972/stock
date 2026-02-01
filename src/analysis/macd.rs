@@ -42,11 +42,11 @@ impl MacdCross {
     }
 }
 
-#[derive(Debug, Clone)]
+// #[derive(Debug, Clone)]
 pub struct MacdResult {
-    dif: f64,
-    macd_signal: f64,
-    histogram: f64,
+    // dif: f64,
+    // macd_signal: f64,
+    // histogram: f64,
 }
 
 pub struct MacdCalculator {
@@ -131,12 +131,12 @@ impl MacdCalculator {
 
         let dif = e12 - e26;
         let signal = self.signal_ema9.next(dif);
-        let histogram = dif - signal;
+        let _histogram = dif - signal;
 
         let res = MacdResult {
-            dif,
-            macd_signal: signal,
-            histogram,
+            // dif,
+            // macd_signal: signal,
+            // histogram,
         };
 
         // 判斷交叉邏輯

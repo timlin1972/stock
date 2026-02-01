@@ -16,16 +16,22 @@ where
 
     let mut result = Vec::new();
 
-    for line in reader.lines() {
-        if let Ok(l) = line {
-            // 如果有註解，用 "//" 切開，只取前半段
-            let clean = l.split("//").next().unwrap().trim();
-            if !clean.is_empty() {
-                result.push(clean.to_string());
-            }
+    // for line in reader.lines() {
+    //     if let Ok(l) = line {
+    //         // 如果有註解，用 "//" 切開，只取前半段
+    //         let clean = l.split("//").next().unwrap().trim();
+    //         if !clean.is_empty() {
+    //             result.push(clean.to_string());
+    //         }
+    //     }
+    // }
+    for l in reader.lines().map_while(Result::ok) {
+        // 如果有註解，用 "//" 切開，只取前半段
+        let clean = l.split("//").next().unwrap().trim();
+        if !clean.is_empty() {
+            result.push(clean.to_string());
         }
     }
-
     Ok(result)
 }
 
@@ -78,7 +84,7 @@ pub struct CompanyInfo {
 
 /// 從 TWSE API 抓取上市公司代號 → 中文名稱
 async fn fetch_twse_company_map(
-    ignore_stocks: &Vec<String>,
+    ignore_stocks: &[String],
 ) -> Result<Vec<CompanyInfo>, Box<dyn Error>> {
     let url = "https://openapi.twse.com.tw/v1/opendata/t187ap03_L";
     let resp = reqwest::get(url).await?.json::<Vec<CompanyInfo>>().await?;
