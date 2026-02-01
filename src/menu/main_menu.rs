@@ -12,13 +12,12 @@ pub fn print_line() {
 pub async fn main_menu(company_map: &CompanyMap) {
     loop {
         println!("Main Menu");
-        println!("1. 抓取資料 (TWSE Data Fetch)");
-        println!("2. 長紅 K 棒分析 (Long Red Candle Analysis)");
-        println!("3. MACD 單日黃金交叉");
-        println!("4. 單日大成交量分析 (Volume Larger Than Threshold Analysis)");
-        println!(
-            "5. MACD黃金交叉且成交量大的綜合分析範例 (MACD Golden Cross and Large Volume Combined Analysis)"
-        );
+        println!("1. 抓取 TWSE 資料");
+        println!("2. 單日長紅 K 棒");
+        println!("3. 單日 MACD 黃金交叉");
+        println!("4. 單日大成交量");
+        println!("5. 單日 MACD 黃金交叉且大成交量");
+        println!("6. 單日十字線");
 
         println!("q/e. 退出 (Quit/Exit)");
         println!("請輸入選項：");
@@ -36,6 +35,7 @@ pub async fn main_menu(company_map: &CompanyMap) {
             "3" => menu_macd_golden_cross_analysis(company_map).await,
             "4" => menu_volume_larger_analysis(company_map).await,
             "5" => menu_macd_golden_cross_volume_larger_analysis(company_map).await,
+            "6" => menu_doji_analysis(company_map).await,
             "q" | "e" => {
                 println!("退出程式");
                 break;
@@ -219,6 +219,30 @@ async fn menu_macd_golden_cross_volume_larger_analysis(company_map: &CompanyMap)
     println!(
         "{:<8} {:<10} {:<4} {}",
         "股號", "日期", "成交張數", "公司名稱"
+    );
+    for result in &results {
+        result.print(&company_map);
+    }
+
+    print_line();
+}
+
+async fn menu_doji_analysis(company_map: &CompanyMap) {
+    println!("請輸入日期 (YYYYMMDD): ");
+    let mut input_date = String::new();
+
+    io::stdin().read_line(&mut input_date).expect("讀取失敗");
+
+    // 去掉換行符號
+    let input_date = input_date.trim();
+
+    print_line();
+
+    let results = scripts::doji::anal_date_all_companies(&company_map, input_date).await;
+
+    println!(
+        "{:<8}{:<6}{:>4}{:>5}{:>5}{:>5}{:>5}{:>6} {}",
+        "日期", "股號", "成交股數", "開盤價", "收盤價", "最高價", "最低價", "漲跌", "公司名稱"
     );
     for result in &results {
         result.print(&company_map);
