@@ -16,6 +16,7 @@ pub fn print_line() {
 pub async fn main_menu(company_map: &CompanyMap) {
     loop {
         println!("Main Menu");
+        println!("每日工作: 1/2/6/8/10");
         println!("1. 抓取 TWSE 資料");
         println!("2. 整理資料");
         println!("3. 單日長紅 K 棒");
@@ -24,6 +25,8 @@ pub async fn main_menu(company_map: &CompanyMap) {
         println!("6. 單日 MACD 黃金交叉且大成交量");
         println!("7. 單日十字線");
         println!("8. 單日十字線波段驗證");
+        println!("9. 多日陽吞噬形態");
+        println!("10. 單日陽吞噬形態");
 
         println!("q/e. 退出 (Quit/Exit)");
         println!("請輸入選項：");
@@ -44,6 +47,8 @@ pub async fn main_menu(company_map: &CompanyMap) {
             "6" => menu_macd_golden_cross_volume_larger_analysis(company_map).await,
             "7" => menu_doji_analysis(company_map).await,
             "8" => menu_doji_in_swing_analysis(company_map).await,
+            "9" => menu_bullish_engulfing_analysis(company_map).await,
+            "10" => menu_bullish_engulfing_analysis_date(company_map).await,
             "q" | "e" => {
                 println!("退出程式");
                 break;
@@ -344,6 +349,61 @@ async fn menu_doji_in_swing_analysis(company_map: &CompanyMap) {
             if result.meet_low { "是" } else { "否" },
             result.daily_data.close * 1.3,
             result.daily_data.close * 0.7,
+            company_map.get(&result.stock_no)
+        );
+    }
+    print_line();
+}
+
+async fn menu_bullish_engulfing_analysis(company_map: &CompanyMap) {
+    println!("請輸入起始月份 (YYYYMM): ");
+    let mut input_from = String::new();
+    io::stdin().read_line(&mut input_from).expect("讀取失敗");
+    let input_from = input_from.trim();
+
+    println!("請輸入結束月份 (YYYYMM): ");
+    let mut input_to = String::new();
+    io::stdin().read_line(&mut input_to).expect("讀取失敗");
+    let input_to = input_to.trim();
+
+    let results = scripts::bullish_engulfing_pattern::anal_range_all_companies(
+        company_map,
+        input_from,
+        input_to,
+    )
+    .await;
+
+    print_line();
+    println!("{:<8}{:<6} 公司名稱", "日期", "股號",);
+
+    for result in &results {
+        println!(
+            "{:<8} {:<6} {:<6}",
+            result.date,
+            result.stock_no,
+            company_map.get(&result.stock_no)
+        );
+    }
+    print_line();
+}
+
+async fn menu_bullish_engulfing_analysis_date(company_map: &CompanyMap) {
+    println!("請輸入日期 (YYYYMMDD): ");
+    let mut input_date = String::new();
+    io::stdin().read_line(&mut input_date).expect("讀取失敗");
+    let input_date = input_date.trim();
+
+    let results =
+        scripts::bullish_engulfing_pattern::anal_date_all_companies(company_map, input_date).await;
+
+    print_line();
+    println!("{:<8}{:<6} 公司名稱", "日期", "股號",);
+
+    for result in &results {
+        println!(
+            "{:<8} {:<6} {:<6}",
+            result.date,
+            result.stock_no,
             company_map.get(&result.stock_no)
         );
     }
