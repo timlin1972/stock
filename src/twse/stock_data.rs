@@ -16,23 +16,39 @@ pub struct TwseResponse {
 
 impl TwseResponse {
     pub async fn new(company_map: &CompanyMap, stock_no: &str, year_month: &str) -> Self {
-        let fetch_result = fetch_stock_data(stock_no, year_month).await.unwrap();
-        let parsed: TwseResponse = serde_json::from_str(&fetch_result).unwrap();
+        loop {
+            let fetch_result = fetch_stock_data(stock_no, year_month).await.unwrap();
+            let parsed: TwseResponse = serde_json::from_str(&fetch_result).unwrap();
 
-        if parsed.stat != "OK" {
-            panic!(
-                "TWSE 回傳錯誤狀態: {} for stock_no: {}({}), year_month: {}",
-                parsed.stat,
-                stock_no,
-                company_map.get(stock_no),
-                year_month
-            );
-        }
-
-        TwseResponse {
-            stat: parsed.stat,
-            title: parsed.title,
-            data: parsed.data,
+            if parsed.stat != "OK" {
+                if parsed.stat.contains("查詢日期大於")
+                    || parsed.stat.contains("查詢日期小於")
+                    || parsed.stat.contains("很抱歉，沒有符合條件的資料")
+                {
+                    println!(
+                        "TWSE 回傳訊息: {} for stock_no: {}({}), year_month: {}. Try again!",
+                        parsed.stat,
+                        stock_no,
+                        company_map.get(stock_no),
+                        year_month
+                    );
+                    continue;
+                } else {
+                    panic!(
+                        "TWSE 回傳錯誤狀態: {} for stock_no: {}({}), year_month: {}",
+                        parsed.stat,
+                        stock_no,
+                        company_map.get(stock_no),
+                        year_month
+                    );
+                }
+            } else {
+                return TwseResponse {
+                    stat: parsed.stat,
+                    title: parsed.title,
+                    data: parsed.data,
+                };
+            }
         }
     }
 }
@@ -51,7 +67,7 @@ pub async fn fetch_stock_data(stock_no: &str, year_month: &str) -> Result<String
 
     let response = client
         .get(&url)
-        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36")
         .header("Accept", "application/json")
         .send()
         .await?;
