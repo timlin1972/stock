@@ -3,6 +3,18 @@
   "year_month": "202602",
   "daily_data": [
     {
+      "date": "115/02/02",
+      "volume": 0,
+      "amount": 0,
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0,
+      "change": 0.0,
+      "transactions": 0,
+      "note": ""
+    },
+    {
       "date": "115/02/03",
       "volume": 1000,
       "amount": 22800,
@@ -12,6 +24,30 @@
       "close": 22.8,
       "change": 0.0,
       "transactions": 1,
+      "note": ""
+    },
+    {
+      "date": "115/02/04",
+      "volume": 80,
+      "amount": 1656,
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0,
+      "change": 0.0,
+      "transactions": 2,
+      "note": ""
+    },
+    {
+      "date": "115/02/05",
+      "volume": 0,
+      "amount": 0,
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0,
+      "change": 0.0,
+      "transactions": 0,
       "note": ""
     }
   ]

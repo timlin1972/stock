@@ -25,6 +25,30 @@
       "change": 1.5,
       "transactions": 50,
       "note": ""
+    },
+    {
+      "date": "115/02/04",
+      "volume": 14635,
+      "amount": 2059089,
+      "open": 141.0,
+      "high": 141.0,
+      "low": 140.0,
+      "close": 140.5,
+      "change": -1.0,
+      "transactions": 39,
+      "note": ""
+    },
+    {
+      "date": "115/02/05",
+      "volume": 11350,
+      "amount": 1584723,
+      "open": 139.0,
+      "high": 140.5,
+      "low": 138.5,
+      "close": 140.0,
+      "change": -0.5,
+      "transactions": 20,
+      "note": ""
     }
   ]
 }
