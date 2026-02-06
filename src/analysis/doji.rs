@@ -53,7 +53,11 @@ pub fn anal_date_company(
             let low = daily.low;
 
             // A simple Doji condition: Open and Close prices are very close
-            if (open - close).abs() < 0.01 * ((high - low).max(1.0)) {
+            // And, open is not equal to high and low
+            // And, close is not equal to high and low
+            if (open - close).abs() < 0.01 * ((high - low).max(1.0)) &&
+               open != high && open != low &&
+               close != high && close != low {
                 ret_results.push(DojiAnalysisResult {
                     stock_no: monthly_data.stock_no.clone(),
                     daily_data: daily.clone(),

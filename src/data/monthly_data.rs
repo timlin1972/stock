@@ -202,3 +202,13 @@ fn nearest_workday(date: NaiveDate) -> NaiveDate {
         _ => date,                                        // 週一到週五 → 今天
     }
 }
+
+// pub async fn get_prev_daily_data(
+//     company_map: &CompanyMap,
+//     stock_no: &str,
+//     year_month_date: &str,
+//     offset: usize
+// ) -> Option<DailyData> {
+//     let monthly_data = MonthlyData::new(company_map, stock_no, year_month_date).await;
+
+// }

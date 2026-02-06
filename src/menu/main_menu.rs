@@ -397,13 +397,15 @@ async fn menu_bullish_engulfing_analysis_date(company_map: &CompanyMap) {
         scripts::bullish_engulfing_pattern::anal_date_all_companies(company_map, input_date).await;
 
     print_line();
-    println!("{:<8}{:<6} 公司名稱", "日期", "股號",);
+    println!("{:<8}{:<4} {:<4} {:<4} 公司名稱", "日期", "股號", "收盤", "高點");
 
     for result in &results {
         println!(
-            "{:<8} {:<6} {:<6}",
+            "{:<8} {:<6} {:<6} {:<5.2} {:<5.2}",
             result.date,
             result.stock_no,
+            result.curr_day.close,
+            result.curr_day.close * 1.3,
             company_map.get(&result.stock_no)
         );
     }

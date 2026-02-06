@@ -7,7 +7,7 @@ pub struct BullishEngulfingPattern {
     pub stock_no: String,
     pub date: String,
     // pub prev_day: DailyData,
-    // pub curr_day: DailyData,
+    pub curr_day: DailyData,
 }
 
 fn is_bullish_engulfing(prev: &DailyData, curr: &DailyData) -> bool {
@@ -57,7 +57,7 @@ pub async fn anal_range_company(
                     stock_no: stock_no.to_string(),
                     date: curr_day.date.clone(),
                     // prev_day: prev_day.clone(),
-                    // curr_day: curr_day.clone(),
+                    curr_day: curr_day.clone(),
                 });
             }
             prev = curr.clone();
@@ -129,7 +129,7 @@ pub async fn anal_date_company(
                     stock_no: stock_no.to_string(),
                     date: curr.date.clone(),
                     // prev_day: prev.clone(),
-                    // curr_day: curr.clone(),
+                    curr_day: curr.clone(),
                 });
             }
         } else {
@@ -145,7 +145,7 @@ pub async fn anal_date_company(
                 stock_no: stock_no.to_string(),
                 date: curr.date.clone(),
                 // prev_day: prev.clone(),
-                // curr_day: curr.clone(),
+                curr_day: curr.clone(),
             });
         }
     }
