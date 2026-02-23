@@ -3,13 +3,14 @@ use crate::data::company::Company;
 
 // 從 date 開始往前數 range 天的資料，找出這段期間的最高價和最低價
 // date 本身不算在內
+// date: yyyymmdd 格式
 pub fn find_max_min_date_range(
     stock_company: &Company,
     date: &str,
     range: usize,
 ) -> Option<(f64, f64)> {
     let curr_date_index =
-        stock_company.get_index_by_date_range(&common::get_fugle_format(date), range)?;
+        stock_company.get_index_by_date_range_backward(&common::get_fugle_format(date), range)?;
 
     let start_index = curr_date_index - range;
 

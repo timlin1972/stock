@@ -1,5 +1,6 @@
 mod analysis;
 mod api;
+mod backtest;
 mod cfg;
 mod common;
 mod consts;

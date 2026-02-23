@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::Instant;
 
 use crate::cfg::CfgData;
 use crate::data::company::Company;
@@ -19,12 +20,15 @@ impl Stocks {
         let mut companies = HashMap::new();
 
         println!("[{MODULE_NAME}] Reading data for all companies...");
+        let start = Instant::now();
         for company in &company_map.company_list {
             companies.insert(
                 company.stock_no.clone(),
                 Company::new(company.stock_no.clone()),
             );
         }
+        let elapsed = start.elapsed();
+        println!("[{MODULE_NAME}] 載入資料花費時間: {:.3?}", elapsed);
 
         Stocks {
             cfg,
