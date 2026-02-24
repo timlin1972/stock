@@ -1,7 +1,10 @@
 use crate::backtest;
 use crate::consts;
 use crate::data::stocks::Stocks;
-use crate::menu::common::{get_choice, get_year_input, print_line, print_swing_price_list};
+use crate::menu::common::{
+    get_choice, get_year_input, print_line, print_lower_upper_30_percent_list,
+    print_swing_price_list,
+};
 
 fn get_date_list(stocks: &mut Stocks) -> Vec<String> {
     // use 2317 as base stock to find date list
@@ -24,12 +27,14 @@ pub fn menu(stocks: &mut Stocks) {
         println!("回測選單");
         print_line();
         println!("  1. 十字線");
+        println!("  2. 陽吞噬");
         println!("  q/e. 退出 (Quit/Exit)");
 
         let choice = get_choice();
 
         match choice.as_str() {
             "1" => menu_doji(stocks, &date_list),
+            "2" => menu_bullish_engulfing(stocks, &date_list),
             "q" | "e" => break,
             _ => println!("無效的選項，請重新輸入"),
         }
@@ -54,5 +59,27 @@ fn menu_doji(stocks: &mut Stocks, date_list: &[String]) {
 
     println!("總共有 {} 支股票在 {} 是十字線", results.len(), input);
     print_swing_price_list(stocks, &results);
+    print_line();
+}
+
+fn menu_bullish_engulfing(stocks: &mut Stocks, date_list: &[String]) {
+    let input = get_year_input();
+
+    print_line();
+    let mut results =
+        backtest::bullish_engulfing::find_bullish_engulfing(stocks, date_list, &input);
+
+    // backtest::price::find_price_change(
+    //     stocks,
+    //     &mut results,
+    //     consts::RANGE_K_DAYS,
+    //     consts::PRICE_MIN_CHANGE_PERCENT,
+    // );
+
+    // results.retain(|result| result.price_change_result.is_some());
+    results.retain(|result| result.stock_data.volume >= 1000 * 1000);
+
+    println!("總共有 {} 支股票在 {} 是陽吞噬", results.len(), input);
+    print_lower_upper_30_percent_list(stocks, &results);
     print_line();
 }

@@ -35,7 +35,7 @@ impl fmt::Display for PriceChangeResult {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum SwingResult {
     UpMinChange,
     DownMinChange,

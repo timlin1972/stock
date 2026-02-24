@@ -1,7 +1,8 @@
 use crate::common;
 use crate::consts;
-use crate::data::company::{StockData, StockDataWithData};
+use crate::data::company::{StockData, StockDataWithData, SwingResult};
 use crate::data::stocks::Stocks;
+use crate::scripts;
 
 fn is_bullish_engulfing(prev: &StockData, curr: &StockData) -> bool {
     // 前一天是黑K
@@ -45,20 +46,22 @@ pub fn find_bullish_engulfing_date(stocks: &mut Stocks, date: &str) -> Vec<Stock
             continue;
         }
 
-        //     if let Some(swing_result) = get_swing_result(
-        //         stock_company,
-        //         date,
-        //         range,
-        //         min_change_percent,
-        //         curr_stock_data,
-        //     ) {
-        //         results.push(StockDataWithData {
-        //             stock_no: company.stock_no.clone(),
-        //             stock_data: curr_stock_data.clone(),
-        //             swing_result: Some(swing_result),
-        //             ..Default::default()
-        //         });
-        //     }
+        // 4. 波段下跌創新低
+        // 5. 要有量，越大越好
+
+        #[allow(clippy::collapsible_if)]
+        if let Some(swing_result) =
+            scripts::common::get_swing_result(stock_company, curr_stock_data)
+        {
+            if swing_result == SwingResult::UpSwingChange {
+                results.push(StockDataWithData {
+                    stock_no: company.stock_no.clone(),
+                    stock_data: curr_stock_data.clone(),
+                    swing_result: Some(swing_result),
+                    ..Default::default()
+                });
+            }
+        }
     }
 
     results
