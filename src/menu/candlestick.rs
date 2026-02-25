@@ -19,6 +19,8 @@ pub fn menu(stocks: &mut Stocks) {
             consts::SWING_MIN_CHANGE_PERCENT * 100.0
         );
         println!("  4. 陽吞噬");
+        println!("  5. 吊人線");
+        println!("  6. 多頭母子");
         println!("  q/e. 退出 (Quit/Exit)");
 
         let choice = get_choice();
@@ -28,6 +30,8 @@ pub fn menu(stocks: &mut Stocks) {
             "2" => menu_doji_date(stocks),
             "3" => menu_doji_date_with_condition(stocks),
             "4" => menu_bullish_engulfing_date(stocks),
+            "5" => menu_hanging_man_date(stocks),
+            "6" => menu_bullish_harami_date(stocks),
             "q" | "e" => break,
             _ => println!("無效的選項，請重新輸入"),
         }
@@ -81,6 +85,28 @@ fn menu_bullish_engulfing_date(stocks: &mut Stocks) {
 
     print_line();
     println!("總共有 {} 支股票在 {input} 是 陽吞噬形態", results.len());
+    print_lower_upper_30_percent_list(stocks, &results);
+    print_line();
+}
+
+fn menu_hanging_man_date(stocks: &mut Stocks) {
+    let input = get_date_input();
+
+    let results = scripts::candlestick::find_hanging_man_date(stocks, &input);
+
+    print_line();
+    println!("總共有 {} 支股票在 {input} 是 吊人線形態", results.len());
+    print_lower_upper_30_percent_list(stocks, &results);
+    print_line();
+}
+
+fn menu_bullish_harami_date(stocks: &mut Stocks) {
+    let input = get_date_input();
+
+    let results = scripts::bullish_harami::find_bullish_harami_date(stocks, &input);
+
+    print_line();
+    println!("總共有 {} 支股票在 {input} 是 多頭母子形態", results.len());
     print_lower_upper_30_percent_list(stocks, &results);
     print_line();
 }

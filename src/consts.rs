@@ -4,9 +4,9 @@ pub const YEAR_TO: i32 = 2026;
 pub const RANGE_20_DAYS: usize = 20;
 pub const RANGE_K_DAYS: usize = 5;
 pub const SWING_MIN_CHANGE_PERCENT: f64 = 0.15; // 15%
-pub const SWING_CHANGE_PERCENT: f64 = 0.3; // 30%
+pub const SWING_CHANGE_PERCENT: f64 = 0.30; // 30%
 
-pub const PRICE_MIN_CHANGE_PERCENT: f64 = 0.1; // 10%
+pub const PRICE_MIN_CHANGE_PERCENT: f64 = 0.08; // 8%
 
 pub const VALID_VOLUME: u64 = 2000; // 成交量至少 2000 張
 

@@ -28,6 +28,7 @@ pub fn menu(stocks: &mut Stocks) {
         print_line();
         println!("  1. 十字線");
         println!("  2. 陽吞噬");
+        println!("  3. 多頭母子");
         println!("  q/e. 退出 (Quit/Exit)");
 
         let choice = get_choice();
@@ -35,6 +36,7 @@ pub fn menu(stocks: &mut Stocks) {
         match choice.as_str() {
             "1" => menu_doji(stocks, &date_list),
             "2" => menu_bullish_engulfing(stocks, &date_list),
+            "3" => menu_bullish_harami(stocks, &date_list),
             "q" | "e" => break,
             _ => println!("無效的選項，請重新輸入"),
         }
@@ -81,5 +83,26 @@ fn menu_bullish_engulfing(stocks: &mut Stocks, date_list: &[String]) {
 
     println!("總共有 {} 支股票在 {} 是陽吞噬", results.len(), input);
     print_lower_upper_30_percent_list(stocks, &results);
+    print_line();
+}
+
+fn menu_bullish_harami(stocks: &mut Stocks, date_list: &[String]) {
+    let input = get_year_input();
+
+    print_line();
+    let mut results = backtest::bullish_harami::find_bullish_harami(stocks, date_list, &input);
+
+    backtest::price::find_price_change(
+        stocks,
+        &mut results,
+        consts::RANGE_K_DAYS,
+        consts::PRICE_MIN_CHANGE_PERCENT,
+    );
+
+    results.retain(|result| result.price_change_result.is_some());
+    // results.retain(|result| result.stock_data.volume >= 1000 * 1000);
+
+    println!("總共有 {} 支股票在 {} 是多頭母子", results.len(), input);
+    print_swing_price_list(stocks, &results);
     print_line();
 }

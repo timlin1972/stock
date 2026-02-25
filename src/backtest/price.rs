@@ -26,8 +26,8 @@ pub fn find_price_change(
 
         // let curr_stock_data = &stock_company.stock_data[curr_date_index];
         let curr_close = stock_data.stock_data.close;
-        let up_price = curr_close * (1.0 + min_change_percent);
-        let down_price = curr_close * (1.0 - min_change_percent);
+        let up_price = (curr_close * (1.0 + min_change_percent)).floor();
+        let down_price = (curr_close * (1.0 - min_change_percent)).ceil();
 
         stock_data.price_change_result = Some(PriceChangeResult::Flat); // 預設為 Flat
         for i in (curr_date_index + 1)..=curr_date_index + range {

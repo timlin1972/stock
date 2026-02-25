@@ -5,9 +5,9 @@ pub enum CandlestickType {
     LongRedCandle,
     LongGreenCandle,
     Doji,
+    HangingMan,
     // LongLowerShadow,
     // LongUpperShadow,
-    // HangingMan,
     // // ShootingStar,
     // // SpinningTop,
     Unknown,
@@ -41,6 +41,12 @@ pub fn candlestick_type(stock_data: &StockData) -> CandlestickType {
         return CandlestickType::Doji;
     }
 
+    // 1. 下影線至少是實體的兩倍長
+    // 2. 收盤價等於最高價
+    if lower_shadow > 2.0 * body_length && close == high {
+        return CandlestickType::HangingMan;
+    }
+
     // } else if (open - close).abs() < 0.01 * ((high - low).max(1.0))
     //     && open != high
     //     && open != low
@@ -67,4 +73,8 @@ pub fn candlestick_type(stock_data: &StockData) -> CandlestickType {
     // }
 
     CandlestickType::Unknown
+}
+
+pub fn is_limit_up(prev_stock_data: &StockData, curr_stock_data: &StockData) -> bool {
+    curr_stock_data.close >= (prev_stock_data.close * 1.1).floor()
 }
