@@ -2,6 +2,7 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
+use crate::analysis;
 use crate::api::fugle;
 use crate::cfg::CfgData;
 use crate::storage;
@@ -62,6 +63,8 @@ pub struct StockDataWithData {
     pub stock_data: StockData,
     pub swing_result: Option<SwingResult>,
     pub price_change_result: Option<PriceChangeResult>,
+    pub macd_result: Option<analysis::macd::MacdResult>,
+    pub volume_change_result: Option<f64>, // 成交量較前一天 Max(MA5, MA10, MA20) 的變化百分比
 }
 
 pub struct Company {
@@ -97,23 +100,7 @@ impl Company {
         self.stock_data.sort_by(|a, b| a.date.cmp(&b.date));
     }
 
-    pub fn get_index_by_date_range_backward(&self, date: &str, range: usize) -> Option<usize> {
-        self.stock_data
-            .iter()
-            .position(|data| data.date == date)
-            .and_then(|index| if index >= range { Some(index) } else { None })
-    }
-
-    pub fn get_index_by_date_range_forward(&self, date: &str, range: usize) -> Option<usize> {
-        self.stock_data
-            .iter()
-            .position(|data| data.date == date)
-            .and_then(|index| {
-                if index + range < self.stock_data.len() {
-                    Some(index)
-                } else {
-                    None
-                }
-            })
+    pub fn get_index_by_date(&self, date: &str) -> Option<usize> {
+        self.stock_data.iter().position(|data| data.date == date)
     }
 }

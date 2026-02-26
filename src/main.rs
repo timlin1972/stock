@@ -1,12 +1,12 @@
 mod analysis;
 mod api;
-mod backtest;
 mod cfg;
 mod common;
+mod conditions;
 mod consts;
 mod data;
 mod menu;
-mod scripts;
+mod monitor;
 mod storage;
 
 #[tokio::main]

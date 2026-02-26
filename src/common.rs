@@ -1,11 +1,20 @@
 pub fn get_fugle_format(date: &str) -> String {
-    // Convert date from "YYYYMMDD" to "YYYY-MM-DD"
-    format!("{}-{}-{}", &date[0..4], &date[4..6], &date[6..8])
-}
+    // if format is YYYY, return YYYY
+    if date.len() == 4 {
+        return date.to_string();
+    }
 
-pub fn get_yyyymmdd_format(date: &str) -> String {
-    // Convert date from "YYYY-MM-DD" to "YYYYMMDD"
-    date.replace("-", "")
+    // if format is YYYYMM, return YYYY-MM
+    if date.len() == 6 {
+        return format!("{}-{}", &date[0..4], &date[4..6]);
+    }
+
+    // if format is YYYYMMDD, return YYYY-MM-DD
+    if date.len() == 8 {
+        return format!("{}-{}-{}", &date[0..4], &date[4..6], &date[6..8]);
+    }
+
+    panic!("日期格式不正確，請輸入 YYYY、YYYYMM 或 YYYYMMDD");
 }
 
 fn format_commas(value: u64) -> String {

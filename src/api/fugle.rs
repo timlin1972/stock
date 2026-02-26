@@ -55,6 +55,7 @@ pub async fn fetch(
                     println!("[{MODULE_NAME}] 股票 {stock_no} 在 {year} 沒有資料，列管已忽略");
                     return Ok(vec![]); // 回傳空資料
                 }
+
                 println!("[{MODULE_NAME}] JSON 解析失敗: {e}");
                 println!("[{MODULE_NAME}] body_text: {body_text}");
                 println!("[{MODULE_NAME}] 3 秒後重試...");

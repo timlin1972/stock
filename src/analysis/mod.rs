@@ -1,2 +1,3 @@
 pub mod candlestick;
-pub mod price;
+pub mod macd;
+pub mod volume;
