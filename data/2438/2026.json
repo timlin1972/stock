@@ -328,5 +328,25 @@
     "volume": 123314,
     "turnover": 2744667,
     "change": 0.1
+  },
+  {
+    "date": "2026-03-02",
+    "open": 22.6,
+    "high": 22.6,
+    "low": 22.05,
+    "close": 22.2,
+    "volume": 149970,
+    "turnover": 3332677,
+    "change": 0.05
+  },
+  {
+    "date": "2026-03-03",
+    "open": 22.2,
+    "high": 23.0,
+    "low": 21.55,
+    "close": 21.7,
+    "volume": 149084,
+    "turnover": 3284162,
+    "change": -0.5
   }
 ]

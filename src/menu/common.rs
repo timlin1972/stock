@@ -111,6 +111,21 @@ pub fn print_lower_30_percent_volume_list(stock: &Stocks, results: &[StockDataWi
     }
 }
 
+pub fn print_volume_list(stock: &Stocks, results: &[StockDataWithData]) {
+    println!("日期       台股    成交張數   收盤價   VolChg 公司名稱",);
+    for result in results {
+        println!(
+            "{:<11}{:<6}{:>10}{:>9.2}{:>9.2}  {:<20}",
+            result.stock_data.date,
+            result.stock_no,
+            common::str_volume(result.stock_data.volume),
+            result.stock_data.close,
+            result.volume_change_result.unwrap(),
+            stock.company_map.get_name(&result.stock_no),
+        );
+    }
+}
+
 pub fn print_lower_30_percent_list(stock: &Stocks, results: &[StockDataWithData]) {
     println!("日期       台股    成交張數   收盤價   -30%     公司名稱",);
     for result in results {

@@ -23,6 +23,7 @@ pub enum Condition {
     BullishHaramiThreeDayReversal,            // 內困三日翻紅
     BearishHaramiThreeDayReversal,            // 內困三日翻黑
     UpsideGapTwoCrows,                        // 烏鴉躍空
+    ThreeWhiteSoldiers,                       // 紅三兵
 }
 
 pub struct Conditions {
@@ -163,7 +164,103 @@ fn filter_condition(
         Condition::UpsideGapTwoCrows => {
             condition_upside_gap_two_crows(stock_company, curr_date_index)
         }
+        Condition::ThreeWhiteSoldiers => {
+            condition_three_white_soldiers(stock_company, curr_date_index, stock_data_with_data)
+        }
     }
+}
+
+// 紅三兵
+// 5%長紅K，量要出在第1,2根K
+// (紅三兵3根裡面，只有2根長紅K也可以)
+// 若第3根K才出量不能買 (拉高出貨)
+fn condition_three_white_soldiers(
+    stock_company: &Company,
+    curr_date_index: usize,
+    stock_data_with_data: &mut StockDataWithData,
+) -> bool {
+    if curr_date_index < 2 {
+        return false; // 如果前面沒有兩筆資料，則無法判斷，直接返回 false
+    }
+
+    let curr_stock_data = &stock_company
+        .stock_data
+        .get(curr_date_index)
+        .expect("找不到日期");
+    let prev_1_stock_data = &stock_company
+        .stock_data
+        .get(curr_date_index - 1)
+        .expect("找不到日期");
+    let prev_2_stock_data = &stock_company
+        .stock_data
+        .get(curr_date_index - 2)
+        .expect("找不到日期");
+
+    // 連續三根紅K
+    if !analysis::candlestick::is_bullish_candlestick(prev_2_stock_data) {
+        return false;
+    }
+    if !analysis::candlestick::is_bullish_candlestick(prev_1_stock_data) {
+        return false;
+    }
+    if !analysis::candlestick::is_bullish_candlestick(curr_stock_data) {
+        return false;
+    }
+
+    // 每根 K 線的實體都要比前一根高
+    if prev_1_stock_data.close <= prev_2_stock_data.close {
+        return false;
+    }
+    if curr_stock_data.close <= prev_1_stock_data.close {
+        return false;
+    }
+
+    // 紅三兵3根裡面，要有2根長紅K
+    let long_red_candle_count = [
+        analysis::candlestick::candlestick_type(prev_2_stock_data),
+        analysis::candlestick::candlestick_type(prev_1_stock_data),
+        analysis::candlestick::candlestick_type(curr_stock_data),
+    ]
+    .iter()
+    .filter(|&c| *c == analysis::candlestick::CandlestickType::LongRedCandle)
+    .count();
+    if long_red_candle_count < 2 {
+        return false;
+    }
+
+    // 量要出在第1,2根K
+    let (ma5_2, ma10_2, ma20_2) =
+        match analysis::volume::find_prev_date_mv(stock_company, curr_date_index - 2) {
+            Some(mv) => mv,
+            None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
+        };
+    let max_mv_2 = ma5_2.max(ma10_2).max(ma20_2);
+    if (prev_2_stock_data.volume as f64) < max_mv_2 * consts::VOLUME_SPIKE_RATIO {
+        return false;
+    }
+
+    let (ma5_1, ma10_1, ma20_1) =
+        match analysis::volume::find_prev_date_mv(stock_company, curr_date_index - 1) {
+            Some(mv) => mv,
+            None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
+        };
+
+    let max_mv_1 = ma5_1.max(ma10_1).max(ma20_1);
+    if (prev_1_stock_data.volume as f64) < max_mv_1 * consts::VOLUME_SPIKE_RATIO {
+        return false;
+    }
+
+    // 計算昨日均量 (MA5, MA10, MA20 的最大值)
+    let (ma5, ma10, ma20) =
+        match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
+            Some(mv) => mv,
+            None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
+        };
+
+    stock_data_with_data.volume_change_result =
+        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+
+    true
 }
 
 // 烏鴉躍空
@@ -686,6 +783,7 @@ fn condition_volume_spike(stock_company: &Company, curr_date_index: usize, ratio
     volume_change_percentage >= ratio
 }
 
+// 長紅K
 fn condition_long_red_candle(stock_company: &Company, curr_date_index: usize) -> bool {
     let stock_data = &stock_company
         .stock_data
@@ -695,6 +793,7 @@ fn condition_long_red_candle(stock_company: &Company, curr_date_index: usize) ->
         == analysis::candlestick::CandlestickType::LongRedCandle
 }
 
+// 十字線
 fn condition_doji(stock_company: &Company, curr_date_index: usize) -> bool {
     let stock_data = &stock_company
         .stock_data
@@ -704,6 +803,7 @@ fn condition_doji(stock_company: &Company, curr_date_index: usize) -> bool {
         == analysis::candlestick::CandlestickType::Doji
 }
 
+// 吊人線
 // 1. 前兩天漲停 (兩根漲停+吊人線 or 一根漲停+漲停吊人線)
 //     (通常吊人線都是漲停)
 // 2. 觀察 1~4 天: 不要動作
@@ -830,6 +930,9 @@ pub fn generate_conditions(condition: &Condition, input: &str) -> Conditions {
                 period: consts::SWING_PERIOD,
                 ratio: consts::SWING_DOWN_RATIO,
             });
+        }
+        Condition::ThreeWhiteSoldiers => {
+            conditions.add_condition(Condition::ThreeWhiteSoldiers);
         }
         Condition::HangingMan => {
             conditions.add_condition(Condition::HangingMan);

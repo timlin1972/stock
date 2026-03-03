@@ -1,3 +1,4 @@
+use crate::common;
 use crate::conditions;
 use crate::data::stocks::Stocks;
 use crate::menu::candlestick;
@@ -14,6 +15,7 @@ struct MonitorStockSource {
 
 #[derive(Serialize, Deserialize, Default)]
 struct MonitorStockResult {
+    gain_loss: f64,
     long_red_candle: bool,
     long_upper_shadow: bool,
     doji: bool,
@@ -26,6 +28,7 @@ struct MonitorStockResult {
     bullish_harami_three_day_reversal: bool,
     bearish_harami_three_day_reversal: bool,
     upside_gap_two_crows: bool,
+    three_white_soldiers: bool,
     hanging_man: bool,
 }
 
@@ -65,7 +68,26 @@ impl MonitorStockList {
 
     pub fn run(&mut self, stocks: &Stocks) {
         for stock in &mut self.stocks {
+            let stock_company = stocks
+                .companies
+                .get(&stock.source.stock_no)
+                .expect("找不到股票資料");
+            let date_fugle = common::get_fugle_format(&self.date);
+            let curr_date_index = stock_company
+                .get_index_by_date(&date_fugle)
+                .expect("找不到日期");
+
+            let curr_stock_data = &stock_company
+                .stock_data
+                .get(curr_date_index)
+                .expect("找不到日期");
+
             stock.result = Some(MonitorStockResult {
+                gain_loss: stock
+                    .source
+                    .buy_price
+                    .map(|buy_price| (curr_stock_data.close - buy_price) / buy_price * 100.0)
+                    .unwrap(),
                 long_red_candle: run_general_condition(
                     stocks,
                     &stock.source.stock_no,
@@ -138,6 +160,12 @@ impl MonitorStockList {
                     &self.date,
                     conditions::Condition::UpsideGapTwoCrows,
                 ),
+                three_white_soldiers: run_general_condition(
+                    stocks,
+                    &stock.source.stock_no,
+                    &self.date,
+                    conditions::Condition::ThreeWhiteSoldiers,
+                ),
                 hanging_man: run_general_condition(
                     stocks,
                     &stock.source.stock_no,
@@ -152,9 +180,14 @@ impl MonitorStockList {
         println!("追蹤日期: {}", self.date);
         for stock in &self.stocks {
             println!(
-                "股票: {} {}",
+                "股票: {} {}, {} => {:3.2}%",
                 stock.source.stock_no,
-                stocks.company_map.get_name(&stock.source.stock_no)
+                stocks.company_map.get_name(&stock.source.stock_no),
+                stock
+                    .source
+                    .buy_price
+                    .map_or("N/A".to_string(), |p| format!("{:.2}", p)),
+                stock.result.as_ref().unwrap().gain_loss
             );
             println!(
                 "    {}: {}",
@@ -223,6 +256,11 @@ impl MonitorStockList {
                 "    {}: {}",
                 candlestick::UPSIDE_GAP_TWO_CROWS_HELP,
                 stock.result.as_ref().unwrap().upside_gap_two_crows
+            );
+            println!(
+                "    {}: {}",
+                candlestick::THREE_WHITE_SOLDIERS_HELP,
+                stock.result.as_ref().unwrap().three_white_soldiers
             );
             println!(
                 "    {}: {}",

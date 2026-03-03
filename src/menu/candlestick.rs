@@ -3,7 +3,7 @@ use crate::data::stocks::Stocks;
 use crate::menu::common::{
     get_choice, get_date_input, print_detail_list, print_line, print_lower_30_percent_list,
     print_lower_30_percent_volume_list, print_lower_upper_30_percent_list,
-    print_upper_30_percent_list, print_upper_30_percent_volume_list,
+    print_upper_30_percent_list, print_upper_30_percent_volume_list, print_volume_list,
 };
 
 pub const LONG_RED_CANDLE_HELP: &str = "長紅K";
@@ -18,7 +18,7 @@ pub const BEARISH_HARAMI_HELP: &str = "空頭母子 (前面要有波段上漲)";
 pub const BULLISH_HARAMI_THREE_DAY_REVERSAL_HELP: &str = "內困三日翻紅 (前面要有波段下跌)";
 pub const BEARISH_HARAMI_THREE_DAY_REVERSAL_HELP: &str = "內困三日翻黑 (前面要有波段上漲)";
 pub const UPSIDE_GAP_TWO_CROWS_HELP: &str = "烏鴉躍空 (前面要有波段上漲)";
-pub const THREE_WHITE_SOLDIERS_HELP: &str = "紅三兵";
+pub const THREE_WHITE_SOLDIERS_HELP: &str = "紅三兵 (看第三天有沒有爆量)";
 pub const THREE_BLACK_CROWS_HELP: &str = "黑三兵";
 pub const BULLISH_CHARIOT_HELP: &str = "多頭戰車 (前面要有漲一段)";
 pub const BEARISH_CHARIOT_HELP: &str = "空頭戰車 (前面要有跌一段)";
@@ -323,30 +323,50 @@ fn menu_upside_gap_two_crows_date(stocks: &mut Stocks) {
     print_line();
 }
 
+// 紅三兵
 fn menu_three_white_soldiers_date(_stocks: &mut Stocks) {
-    println!("功能尚未實作");
+    let input = get_date_input();
+
+    let mut conditions =
+        conditions::generate_conditions(&conditions::Condition::ThreeWhiteSoldiers, input.as_str());
+    conditions.run(_stocks);
+    let results = conditions.get_results().clone();
+
+    print_line();
+    println!(
+        "總共有 {} 支股票在 {input} 是 {THREE_WHITE_SOLDIERS_HELP}",
+        results.len(),
+    );
+    print_volume_list(_stocks, &results);
+    print_line();
 }
 
+// 黑三兵
 fn menu_three_black_crows_date(_stocks: &mut Stocks) {
     println!("功能尚未實作");
 }
 
+// 多頭戰車
 fn menu_bullish_chariot_date(_stocks: &mut Stocks) {
     println!("功能尚未實作");
 }
 
+// 空頭戰車
 fn menu_bearish_chariot_date(_stocks: &mut Stocks) {
     println!("功能尚未實作");
 }
 
+// 連續排列: 上升三法
 fn menu_rising_three_methods_date(_stocks: &mut Stocks) {
     println!("功能尚未實作");
 }
 
+// 連續排列: 下降三法
 fn menu_falling_three_methods_date(_stocks: &mut Stocks) {
     println!("功能尚未實作");
 }
 
+// 吊人線
 fn menu_hanging_man_date(stocks: &mut Stocks) {
     let input = get_date_input();
 
