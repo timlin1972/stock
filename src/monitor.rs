@@ -9,8 +9,10 @@ const MONITOR_STOCK_LIST_FILE: &str = "monitor_stock_list.json";
 
 #[derive(Serialize, Deserialize, Default)]
 struct MonitorStockSource {
+    date: String,
     stock_no: String,
     buy_price: Option<f64>,
+    reason: String,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -179,6 +181,7 @@ impl MonitorStockList {
     pub fn print(&self, stocks: &Stocks) {
         println!("追蹤日期: {}", self.date);
         for stock in &self.stocks {
+            crate::menu::common::print_line();
             println!(
                 "股票: {} {}, {} => {:3.2}%",
                 stock.source.stock_no,
@@ -187,85 +190,96 @@ impl MonitorStockList {
                     .source
                     .buy_price
                     .map_or("N/A".to_string(), |p| format!("{:.2}", p)),
-                stock.result.as_ref().unwrap().gain_loss
+                stock.result.as_ref().unwrap().gain_loss,
             );
             println!(
-                "    {}: {}",
+                "股票: {} {}, {} 原因: {}",
+                stock.source.stock_no,
+                stocks.company_map.get_name(&stock.source.stock_no),
+                stock.source.date,
+                stock.source.reason,
+            );
+            println!(
+                "    {:>30}: {}",
                 candlestick::LONG_RED_CANDLE_HELP,
-                stock.result.as_ref().unwrap().long_red_candle
+                bool_to_symbol(stock.result.as_ref().unwrap().long_red_candle)
             );
             println!(
-                "    {}: {}",
+                "    {:>28}: {}",
                 candlestick::LONG_UPPER_SHADOW_HELP,
-                stock.result.as_ref().unwrap().long_upper_shadow
+                bool_to_symbol(stock.result.as_ref().unwrap().long_upper_shadow)
             );
             println!(
-                "    {}: {}",
+                "    {:>29}: {}",
                 candlestick::DOJI_HELP,
-                stock.result.as_ref().unwrap().doji
+                bool_to_symbol(stock.result.as_ref().unwrap().doji)
             );
             println!(
-                "    {}: {}",
+                "    {:>29}: {}",
                 candlestick::GRAVESTONE_DOJI_HELP,
-                stock.result.as_ref().unwrap().gravestone_doji
+                bool_to_symbol(stock.result.as_ref().unwrap().gravestone_doji)
             );
             println!(
-                "    {}: {}",
+                "    {:>19}: {}",
                 candlestick::BULLISH_ENGULFING_HELP,
-                stock.result.as_ref().unwrap().bullish_engulfing
+                bool_to_symbol(stock.result.as_ref().unwrap().bullish_engulfing)
             );
             println!(
-                "    {}: {}",
+                "    {:>21}: {}",
                 candlestick::BEARISH_ENGULFING_HELP,
-                stock.result.as_ref().unwrap().bearish_engulfing
+                bool_to_symbol(stock.result.as_ref().unwrap().bearish_engulfing)
             );
             println!(
-                "    {}: {}",
+                "    {:>20}: {}",
                 candlestick::DARK_CLOUD_COVER_HELP,
-                stock.result.as_ref().unwrap().dark_cloud_cover
+                bool_to_symbol(stock.result.as_ref().unwrap().dark_cloud_cover)
             );
             println!(
-                "    {}: {}",
+                "    {:>20}: {}",
                 candlestick::BULLISH_HARAMI_HELP,
-                stock.result.as_ref().unwrap().bullish_harami
+                bool_to_symbol(stock.result.as_ref().unwrap().bullish_harami)
             );
             println!(
-                "    {}: {}",
+                "    {:>20}: {}",
                 candlestick::BEARISH_HARAMI_HELP,
-                stock.result.as_ref().unwrap().bearish_harami
+                bool_to_symbol(stock.result.as_ref().unwrap().bearish_harami)
             );
             println!(
-                "    {}: {}",
+                "    {:>18}: {}",
                 candlestick::BULLISH_HARAMI_THREE_DAY_REVERSAL_HELP,
-                stock
-                    .result
-                    .as_ref()
-                    .unwrap()
-                    .bullish_harami_three_day_reversal
+                bool_to_symbol(
+                    stock
+                        .result
+                        .as_ref()
+                        .unwrap()
+                        .bullish_harami_three_day_reversal
+                )
             );
             println!(
-                "    {}: {}",
+                "    {:>18}: {}",
                 candlestick::BEARISH_HARAMI_THREE_DAY_REVERSAL_HELP,
-                stock
-                    .result
-                    .as_ref()
-                    .unwrap()
-                    .bearish_harami_three_day_reversal
+                bool_to_symbol(
+                    stock
+                        .result
+                        .as_ref()
+                        .unwrap()
+                        .bearish_harami_three_day_reversal
+                )
             );
             println!(
-                "    {}: {}",
+                "    {:>20}: {}",
                 candlestick::UPSIDE_GAP_TWO_CROWS_HELP,
-                stock.result.as_ref().unwrap().upside_gap_two_crows
+                bool_to_symbol(stock.result.as_ref().unwrap().upside_gap_two_crows)
             );
             println!(
-                "    {}: {}",
+                "    {:>20}: {}",
                 candlestick::THREE_WHITE_SOLDIERS_HELP,
-                stock.result.as_ref().unwrap().three_white_soldiers
+                bool_to_symbol(stock.result.as_ref().unwrap().three_white_soldiers)
             );
             println!(
-                "    {}: {}",
+                "    {:>29}: {}",
                 candlestick::HANGING_MAN_HELP,
-                stock.result.as_ref().unwrap().hanging_man
+                bool_to_symbol(stock.result.as_ref().unwrap().hanging_man)
             );
         }
     }
@@ -287,4 +301,8 @@ fn run_general_condition(
     let result = conditions.run_single(stocks, stock_no, date);
 
     result.is_some()
+}
+
+fn bool_to_symbol(value: bool) -> &'static str {
+    if value { "V" } else { "-" }
 }
