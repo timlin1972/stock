@@ -5,7 +5,7 @@ const RANGE_5_DAYS: usize = 5;
 const RANGE_10_DAYS: usize = 10;
 const RANGE_20_DAYS: usize = 20;
 
-// 找出 curr_date_index 前一日的均量 (MA5, MA10, MA20)
+// 找出 curr_date_index 前一日的均量 (MV5, MV10, MV20)
 pub fn find_prev_date_mv(
     stock_company: &Company,
     curr_date_index: usize,

@@ -24,6 +24,7 @@ pub enum Condition {
     BearishHaramiThreeDayReversal,            // 內困三日翻黑
     UpsideGapTwoCrows,                        // 烏鴉躍空
     ThreeWhiteSoldiers,                       // 紅三兵
+    BreakawayGap,                             // 突破缺口
 }
 
 pub struct Conditions {
@@ -167,7 +168,63 @@ fn filter_condition(
         Condition::ThreeWhiteSoldiers => {
             condition_three_white_soldiers(stock_company, curr_date_index, stock_data_with_data)
         }
+        Condition::BreakawayGap => condition_breakaway_gap(stock_company, curr_date_index),
     }
+}
+
+// 突破缺口
+// 1. 買紅K
+// 2. 漲帶量
+// 3. 缺口加收盤要一次站上 5/10/20 日均線
+// 4. 缺口越大越好
+// 5. 不可以回到缺口 (連碰都不能碰) ⇒ 假突破真跌破
+fn condition_breakaway_gap(stock_company: &Company, curr_date_index: usize) -> bool {
+    if curr_date_index == 0 {
+        return false; // 如果是第一筆資料，則無法判斷前一天的 K 線，直接返回 false
+    }
+
+    let curr_stock_data = &stock_company
+        .stock_data
+        .get(curr_date_index)
+        .expect("找不到日期");
+    let prev_1_stock_data = &stock_company
+        .stock_data
+        .get(curr_date_index - 1)
+        .expect("找不到日期");
+
+    // 買紅K
+    if !analysis::candlestick::is_bullish_candlestick(curr_stock_data) {
+        return false;
+    }
+
+    // 漲帶量
+    let (mv5, mv10, mv20) =
+        match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
+            Some(mv) => mv,
+            None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
+        };
+    let max_mv = mv5.max(mv10).max(mv20);
+    if (curr_stock_data.volume as f64) < max_mv * consts::VOLUME_SPIKE_RATIO {
+        return false;
+    }
+
+    // 收盤要一次站上 5/10/20 日均線
+    let (ma5, ma10, ma20) = match analysis::price::find_prev_date_ma(stock_company, curr_date_index)
+    {
+        Some(ma) => ma,
+        None => return false, // 如果找不到均線資料，則無法判斷，直接返回 false
+    };
+    let max_ma = ma5.max(ma10).max(ma20);
+    if curr_stock_data.close <= max_ma {
+        return false;
+    }
+
+    // 要有缺口，且缺口向上
+    if curr_stock_data.open <= prev_1_stock_data.close.max(prev_1_stock_data.open) {
+        return false;
+    }
+
+    true
 }
 
 // 紅三兵
@@ -229,36 +286,36 @@ fn condition_three_white_soldiers(
     }
 
     // 量要出在第1,2根K
-    let (ma5_2, ma10_2, ma20_2) =
+    let (mv5_2, mv10_2, mv20_2) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index - 2) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
-    let max_mv_2 = ma5_2.max(ma10_2).max(ma20_2);
+    let max_mv_2 = mv5_2.max(mv10_2).max(mv20_2);
     if (prev_2_stock_data.volume as f64) < max_mv_2 * consts::VOLUME_SPIKE_RATIO {
         return false;
     }
 
-    let (ma5_1, ma10_1, ma20_1) =
+    let (mv5_1, mv10_1, mv20_1) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index - 1) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
-    let max_mv_1 = ma5_1.max(ma10_1).max(ma20_1);
+    let max_mv_1 = mv5_1.max(mv10_1).max(mv20_1);
     if (prev_1_stock_data.volume as f64) < max_mv_1 * consts::VOLUME_SPIKE_RATIO {
         return false;
     }
 
     // 計算昨日均量 (MA5, MA10, MA20 的最大值)
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
     stock_data_with_data.volume_change_result =
-        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+        Some(curr_stock_data.volume as f64 / mv5.max(mv10).max(mv20));
 
     true
 }
@@ -365,14 +422,14 @@ fn condition_bullish_harami_three_day_reversal(
     }
 
     // 計算昨日均量 (MA5, MA10, MA20 的最大值)
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
     stock_data_with_data.volume_change_result =
-        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+        Some(curr_stock_data.volume as f64 / mv5.max(mv10).max(mv20));
 
     true
 }
@@ -430,14 +487,14 @@ fn condition_bearish_harami_three_day_reversal(
     }
 
     // 計算昨日均量 (MA5, MA10, MA20 的最大值)
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
     stock_data_with_data.volume_change_result =
-        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+        Some(curr_stock_data.volume as f64 / mv5.max(mv10).max(mv20));
 
     true
 }
@@ -574,14 +631,14 @@ fn condition_dark_cloud_cover(
     }
 
     // 計算昨日均量 (MA5, MA10, MA20 的最大值)
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
     stock_data_with_data.volume_change_result =
-        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+        Some(curr_stock_data.volume as f64 / mv5.max(mv10).max(mv20));
 
     true
 }
@@ -664,14 +721,14 @@ fn condition_bullish_engulfing(
 
     // 4. 需要出量(昨日均量的 1.5倍以上)，量越大，買越多
     // 計算昨日均量 (MA5, MA10, MA20 的最大值)
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
 
     stock_data_with_data.volume_change_result =
-        Some(curr_stock_data.volume as f64 / ma5.max(ma10).max(ma20));
+        Some(curr_stock_data.volume as f64 / mv5.max(mv10).max(mv20));
 
     true
 }
@@ -770,12 +827,12 @@ fn condition_volume_spike(stock_company: &Company, curr_date_index: usize, ratio
         .stock_data
         .get(curr_date_index)
         .expect("找不到日期");
-    let (ma5, ma10, ma20) =
+    let (mv5, mv10, mv20) =
         match analysis::volume::find_prev_date_mv(stock_company, curr_date_index) {
             Some(mv) => mv,
             None => return false, // 如果找不到均量資料，則無法判斷，直接返回 false
         };
-    let max_mv = ma5.max(ma10).max(ma20);
+    let max_mv = mv5.max(mv10).max(mv20);
     if max_mv == 0.0 {
         return false; // 避免除以零
     }

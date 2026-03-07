@@ -1,6 +1,7 @@
 use crate::data::stocks::Stocks;
 use crate::menu::candlestick;
 use crate::menu::common::{get_choice, print_line};
+use crate::menu::gap;
 use crate::menu::midterm;
 use crate::monitor;
 
@@ -12,7 +13,8 @@ pub async fn main_menu(stocks: &mut Stocks) {
         println!("  1. 抓 2026 全部股票資料");
         println!("  2. 追蹤個股");
         println!("  20. K線");
-        println!("  30. 中期");
+        println!("  30. 缺口");
+        println!("  40. 中期");
         println!("  0/q/e. 退出 (Quit/Exit)");
 
         let choice = get_choice();
@@ -21,7 +23,8 @@ pub async fn main_menu(stocks: &mut Stocks) {
             "1" => menu_fetch_data_all_companies(stocks).await,
             "2" => menu_monitor(stocks),
             "20" => candlestick::menu(stocks),
-            "30" => midterm::menu(stocks),
+            "30" => gap::menu(stocks),
+            "40" => midterm::menu(stocks),
             "0" | "q" | "e" => break,
             _ => println!("無效的選項，請重新輸入"),
         }
